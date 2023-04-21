@@ -91,7 +91,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/AmusementParkTicketManagementSystem/swagger/v1/swagger.json", "EFieldBook v1"));
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/APMS/swagger/v1/swagger.json", "APMS v1"));
 }
 
 
