@@ -1,5 +1,7 @@
 using APMS.Data;
 using APMS.Services.Interface;
+using APMS.Services.Interface.Services;
+using APMS.Services.Logging;
 using APMS.Services.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -73,6 +75,7 @@ builder.Services.AddSwaggerGen(swagger =>
 builder.Services.AddTransient<IUserService, UserService>();
 #endregion
 
+builder.Services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
