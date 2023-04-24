@@ -11,14 +11,12 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-
            // Adding Jwt Bearer
            .AddJwtBearer(options =>
            {
@@ -74,7 +72,6 @@ builder.Services.AddSwaggerGen(swagger =>
           
 builder.Services.AddTransient<IUserService, UserService>();
 #endregion
-
 builder.Services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -82,9 +79,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<APMSDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TicketManagementConnection")));
-
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -93,7 +88,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/APMS/swagger/v1/swagger.json", "APMS v1"));
 }
-
 
 app.UseHttpsRedirection();
 

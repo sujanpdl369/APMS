@@ -2,9 +2,12 @@
 using APMS.Common.ViewModel;
 using APMS.Data;
 using APMS.Services.Interface;
+using Azure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using System.Linq.Expressions;
+using System.Reflection.Metadata.Ecma335;
+using Response = APMS.Common.ViewModel.Response;
 
 namespace APMS.Services.Repositories
 {
@@ -15,36 +18,46 @@ namespace APMS.Services.Repositories
         {
             _APMSDbContext = APMSDbContext;
         }
-        public async Task<string> Register(RegisterVM register)
+        public async Task<Response> UserSignUp(RegisterVM register)
+        {
+            if (await this._APMSDbContext.Registers.AnyAsync<Register>(u => u.UserName == register.UserName))
+                return new Response()
+                {
+                    ResponseData = null,
+                    StatusCode = 1,
+                    StatusMessage = "UserName already exists"
+                };
+            string password = BCrypt.Net.BCrypt.HashPassword(register.Password);
+            Register user = new Register()
+            {
+                UserName = register.UserName,
+                MobileNumber = register.MobileNumber,
+                Email = register.Email,
+                Password = password,
+                Location = register.Location,
+                CreatedDate = DateTime.Now,
+            };
+            await _APMSDbContext.Registers.AddAsync(user);
+            await _APMSDbContext.SaveChangesAsync();
+        
+         
+            return new Response()
+            {
+                ResponseData = user,
+                StatusCode = 0,
+                StatusMessage = "Signed Up Successfully"
+            };
+        }
+        public async Task<Register> Login(LoginVM loginVM)
         {
             try
             {
-                var userExists = await _APMSDbContext.Registers.Where(x => x.Email.Equals(register.Email)).AnyAsync();
-                if (!userExists)
-                {
-                    var passwordHasher = new PasswordHasher<Register>();
-
-                    Register regi = new Register
-                    {
-                        UserName = register.UserName,
-                        MobileNumber = register.MobileNumber,
-                        Email = register.Email,
-                        Location = register.Location,
-                        CreatedDate = DateTime.Now,
-                    };
-                    regi.Password = passwordHasher.HashPassword(regi, register.Password);
-                    await _APMSDbContext.AddAsync(regi);
-                    await _APMSDbContext.SaveChangesAsync();
-                    return "Registered Successfully!";
-                }
-                else
-                {
-                    return "Email already Exist";
-                }
-
+                var response = _APMSDbContext.Registers.Where(c => c.UserName.Equals(loginVM.Username) && c.Password.Equals(loginVM.Password)).FirstOrDefault();
+                if (!(response is null)) return response; else return null;
             }
             catch (Exception ex)
             {
+
                 throw ex;
             }
         }
