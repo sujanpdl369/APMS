@@ -1,11 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using APMS.Common.Domain;
+using System.ComponentModel.DataAnnotations;
 
 namespace APMS.Common.Models;
 
-public partial class Register
+public partial class Register : BaseEntity
 {
-    [Key]
-    public int Id { get; set; } 
     public string UserName { get; set; } = null!;
 
     public int MobileNumber { get; set; } 
