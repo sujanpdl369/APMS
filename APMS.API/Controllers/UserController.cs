@@ -62,7 +62,7 @@ namespace AmusementParkTicketManagementSystem.Controllers
                     return new ApiCallResponse()
                     { Success = false, ErrorCode = 0, ErrorMessage = "Invalid Model", Data = null };
                 }
-                Register register = _APMSDbContext.Registers.Where<Register>((Expression<Func<Register, bool>>)(c => c.UserName == loginVM.Username)).FirstOrDefault<Register>();
+                Register register = _APMSDbContext.Registers.Where<Register>(c => c.UserName == loginVM.Username).FirstOrDefault<Register>();
                 if (register == null)
                     return new ApiCallResponse()
                     {
@@ -89,7 +89,7 @@ namespace AmusementParkTicketManagementSystem.Controllers
                     return new ApiCallResponse()
                     {
                         Success = true,
-                        Data = (object)new LoginRequestData()
+                        Data = new LoginRequestData()
                         {
                             auth_token = new JwtSecurityTokenHandler().WriteToken((SecurityToken)token)
                         }
@@ -99,7 +99,7 @@ namespace AmusementParkTicketManagementSystem.Controllers
                 {
                     Success = false,
                     ErrorCode = 0,
-                    Data = (object)null,
+                    Data = null,
                     ErrorMessage = "Password does not match"
                 };
             }
@@ -110,7 +110,34 @@ namespace AmusementParkTicketManagementSystem.Controllers
                     Success = false,
                     ErrorCode = 0,
                     ErrorMessage = ex.Message,
-                    Data = (object)null
+                    Data = null
+                };
+            }
+        }
+
+
+        [Route ("api/[controller]/ChangePassword")]
+        [HttpPost]
+        public async Task<ApiCallResponse> ChangePassword(ChangePasswordVM changePasswordVM)
+        {
+            var response = await _userService.ChangePasswordAsync(changePasswordVM);
+            if(response.StatusCode ==0 )
+            {
+                return new ApiCallResponse()
+                {
+                    Success = true,
+                    Data = response
+
+                };
+            }
+            else
+            {
+                return new ApiCallResponse()
+                {
+                    Success = false,
+                    ErrorCode = 0,
+                    ErrorMessage = "Failed to Change Password",
+                    Data = null
                 };
             }
         }

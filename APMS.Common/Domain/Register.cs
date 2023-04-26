@@ -5,6 +5,10 @@ namespace APMS.Common.Models;
 
 public partial class Register : BaseEntity
 {
+    public string Title { get; set; }   
+    public string FirstName { get; set; }
+    public string LastName { get; set; } 
+    public DateTime DOB { get; set; }
     public string UserName { get; set; } = null!;
 
     public int MobileNumber { get; set; } 

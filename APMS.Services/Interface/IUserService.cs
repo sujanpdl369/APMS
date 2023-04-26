@@ -7,5 +7,7 @@ namespace APMS.Services.Interface
     {
         Task<Response> UserSignUp(RegisterVM register);
         Task<Register> Login(LoginVM loginVM);
+        Task<Response> ChangePasswordAsync(ChangePasswordVM changePasswordVM);
+
     }
 }
