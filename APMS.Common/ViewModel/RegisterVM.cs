@@ -1,5 +1,4 @@
-﻿
-using APMS.Common.Models;
+﻿using APMS.Common.Models;
 
 namespace APMS.Common.ViewModel
 {
@@ -21,6 +20,8 @@ namespace APMS.Common.ViewModel
             Password = register.Password;
             Location = register.Location;
             CreatedDate = register.CreatedDate;
+            ModifiedDate = register.ModifiedDate;
+            
         }
         public string Title { get; set; }
         public string FirstName { get; set; }
@@ -35,7 +36,8 @@ namespace APMS.Common.ViewModel
         public string Password { get; set; } = null!;
 
         public string Location { get; set; } = null!;
-
         public DateTime CreatedDate { get; set; }
+        public DateTime ModifiedDate { get; set; }
+        
     }
 }

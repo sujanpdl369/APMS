@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace APMS.Common.ViewModel
+﻿namespace APMS.Common.ViewModel
 {
     public class ChangePasswordVM
     {

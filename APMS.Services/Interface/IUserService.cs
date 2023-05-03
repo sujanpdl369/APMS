@@ -1,5 +1,6 @@
 ﻿using APMS.Common.Models;
 using APMS.Common.ViewModel;
+using Microsoft.AspNetCore.Http;
 
 namespace APMS.Services.Interface
 {
@@ -8,6 +9,11 @@ namespace APMS.Services.Interface
         Task<Response> UserSignUp(RegisterVM register);
         Task<Register> Login(LoginVM loginVM);
         Task<Response> ChangePasswordAsync(ChangePasswordVM changePasswordVM);
-
+        Task<Register> GetUserProfile();
+        Task<bool> UpdateUserProfile(RegisterVM registerVM);
+        Task<bool> UploadProfilePicture(IFormFile file, byte[] profilePicture);
+        Task<byte[]?> GetProfilePictureAsync();
+        Task<Response> Genders(string gender);
+        Task<Response> UpdateAddressDetails(AddressDetailVM addressDetailVM);
     }
 }

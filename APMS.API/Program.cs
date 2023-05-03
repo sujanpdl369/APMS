@@ -71,16 +71,18 @@ builder.Services.AddSwaggerGen(swagger =>
 #region Dependency Injection
           
 builder.Services.AddTransient<IUserService, UserService>();
+
+
 #endregion
 builder.Services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<APMSDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TicketManagementConnection")));
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

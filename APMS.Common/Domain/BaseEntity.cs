@@ -10,6 +10,6 @@ namespace APMS.Common.Domain
     public class BaseEntity
     {
         [Key]
-        public int Id { get; set; }
+        public int RegisterId { get; set; }
     }
 }

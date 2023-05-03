@@ -1,12 +1,12 @@
-﻿using APMS.Common.Models;
+﻿using APMS.API;
+using APMS.Common.Enum;
 using APMS.Common.ViewModel;
 using APMS.Data;
 using APMS.Services.Interface;
-using Azure;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
+using System.Security.Claims;
+using Register = APMS.Common.Models.Register;
 using Response = APMS.Common.ViewModel.Response;
 
 namespace APMS.Services.Repositories
@@ -14,9 +14,13 @@ namespace APMS.Services.Repositories
     public class UserService : IUserService
     {
         private readonly APMSDbContext _APMSDbContext;
-        public UserService(APMSDbContext APMSDbContext)
+        private readonly IHttpContextAccessor _HttpContextAccessor;
+     
+        public UserService(APMSDbContext APMSDbContext, IHttpContextAccessor httpContextAccessor)
         {
             _APMSDbContext = APMSDbContext;
+            _HttpContextAccessor = httpContextAccessor;
+           
         }
         public async Task<Response> UserSignUp(RegisterVM register)
         {
@@ -56,14 +60,159 @@ namespace APMS.Services.Repositories
         {
             try
             {
-                var response = _APMSDbContext.Registers.Where(c => c.UserName.Equals(loginVM.Username) && c.Password.Equals(loginVM.Password)).FirstOrDefault();
-                if (!(response is null)) return response; else return null;
+                var register = await _APMSDbContext.Registers.FirstOrDefaultAsync(c => c.UserName.Equals(loginVM.Username));
+                if (register == null)
+                {
+                    return null;
+                }
+
+                if (new CustomPasswordHasher().checkUserPassword(register, loginVM.Password))
+                {
+                    return register;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<Response>UpdateAddressDetails(AddressDetailVM addressDetailVM)
+        {
+            var userId = _HttpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return null;
+            var register = _APMSDbContext.Registers.Where(i => i.RegisterId.ToString() == userId).FirstOrDefault();
+            if (register == null)
+                return null;
+            register.Country = addressDetailVM.Country;
+            register.City = addressDetailVM.City;
+            register.State = addressDetailVM.State;
+            register.Status = addressDetailVM.Status;
+            try
+            {
+                await _APMSDbContext.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return new Response()
+            {
+                ResponseData = register,
+                StatusCode = 0,
+                StatusMessage = "Address detail added Successfully"
+            };
+
+        }
+        public async Task<Response> Genders(string gender)
+        {
+            var userId = _HttpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return null;
+            var register = _APMSDbContext.Registers.Where(i => i.RegisterId.ToString() == userId).FirstOrDefault();
+            if (register == null)
+                return null;
+            if (gender == "Male")
+                register.Gender = Gender.Male;
+            else if (gender == "Female")
+                register.Gender = Gender.Female;
+            else if (gender == "Others")
+                register.Gender = Gender.Others;
+            else
+                return null;
+            try
+            {
+                await _APMSDbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
 
                 throw ex;
             }
+            return new Response()
+            {
+                ResponseData = register,
+                StatusCode = 0,
+                StatusMessage = "Gender Added Successfully"
+            };
+        }
+        //Get User Detail for User Profile
+        public async Task<Register> GetUserProfile()
+        {
+            var userId = _HttpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var data = await _APMSDbContext.Registers.SingleOrDefaultAsync(x => x.RegisterId.ToString() == userId);
+            return data;
+        }
+
+        //Update User Detail for User Profile
+
+        public async Task<bool> UpdateUserProfile(RegisterVM registerVM)
+        {
+            try
+            {
+                var userId = _HttpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var existingUser = await _APMSDbContext.Registers.SingleOrDefaultAsync(x => x.RegisterId.ToString() == userId);
+                if (existingUser == null)
+                    return false;
+                string password = BCrypt.Net.BCrypt.HashPassword(existingUser.Password);
+                existingUser.FirstName = registerVM.FirstName;
+                existingUser.LastName = registerVM.LastName;
+                existingUser.Email = registerVM.Email;
+                existingUser.MobileNumber = registerVM.MobileNumber;
+                existingUser.Location = registerVM.Location;
+                existingUser.DOB = registerVM.DOB;
+                existingUser.Password = password;
+                existingUser.UserName = registerVM.UserName;
+                existingUser.Title = registerVM.Title;
+                existingUser.ModifiedDate = DateTime.Now;
+                _APMSDbContext.Registers.Update(existingUser);
+                await _APMSDbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        
+
+        public async Task<bool> UploadProfilePicture(IFormFile file, byte[] profilePicture)
+        {
+            var Id = _HttpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var register = await _APMSDbContext.Set<Register>().FirstOrDefaultAsync(x => x.RegisterId.ToString() == Id);
+
+            if (register == null)
+            {
+                return false;
+            }
+
+            register.ProfilePicture = profilePicture;
+            _APMSDbContext.Entry(register).State = EntityState.Modified;
+
+            try
+            {
+                await _APMSDbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+        }
+
+        public async Task<byte[]?> GetProfilePictureAsync()
+        {
+            var Id = _HttpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var register = await _APMSDbContext.Set<Register>().FirstOrDefaultAsync(x => x.RegisterId.ToString() == Id);
+            if (register == null || register.ProfilePicture == null)
+                return null;
+
+            return register.ProfilePicture;
         }
 
         public async Task<Response> ChangePasswordAsync(ChangePasswordVM changePasswordVM)

@@ -3,7 +3,6 @@ using APMS.Data;
 using APMS.Services.Interface.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
 
 
 namespace APMS.Services.Logging
@@ -11,8 +10,6 @@ namespace APMS.Services.Logging
     public class LoggerAdapter<T> : IAppLogger<T>
     {
         private readonly ILogger<T> _logger;
-        private readonly HttpContext context;
-        private readonly APMSDbContext aPMSDbContext;
         public LoggerAdapter(ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger<T>();
