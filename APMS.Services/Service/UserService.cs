@@ -79,7 +79,7 @@ namespace APMS.Services.Repositories
             }
         }
 
-        public async Task<Response>UpdateAddressDetails(AddressDetailVM addressDetailVM)
+        public async Task<Response>AddUserDetails(AddressDetailVM addressDetailVM)
         {
             var userId = _HttpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
@@ -91,6 +91,23 @@ namespace APMS.Services.Repositories
             register.City = addressDetailVM.City;
             register.State = addressDetailVM.State;
             register.Status = addressDetailVM.Status;
+            if(addressDetailVM.gender == "Male")
+            {
+                register.Gender = Gender.Male;
+            }
+            else if(addressDetailVM.gender == "Female")
+            {
+                register.Gender = Gender.Female;
+            }
+            else if(addressDetailVM.gender == "Others")
+            {
+                register.Gender = Gender.Others;
+            }
+            else
+            {
+                return null;
+            }
+            
             try
             {
                 await _APMSDbContext.SaveChangesAsync();
@@ -108,38 +125,7 @@ namespace APMS.Services.Repositories
             };
 
         }
-        public async Task<Response> Genders(string gender)
-        {
-            var userId = _HttpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-                return null;
-            var register = _APMSDbContext.Registers.Where(i => i.RegisterId.ToString() == userId).FirstOrDefault();
-            if (register == null)
-                return null;
-            if (gender == "Male")
-                register.Gender = Gender.Male;
-            else if (gender == "Female")
-                register.Gender = Gender.Female;
-            else if (gender == "Others")
-                register.Gender = Gender.Others;
-            else
-                return null;
-            try
-            {
-                await _APMSDbContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-            return new Response()
-            {
-                ResponseData = register,
-                StatusCode = 0,
-                StatusMessage = "Gender Added Successfully"
-            };
-        }
+       
         //Get User Detail for User Profile
         public async Task<Register> GetUserProfile()
         {

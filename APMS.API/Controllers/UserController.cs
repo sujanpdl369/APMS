@@ -112,10 +112,10 @@ namespace AmusementParkTicketManagementSystem.Controllers
             }
         }
 
-        [HttpPost(nameof(AddressDetail)), Authorize]
-        public async Task<ApiCallResponse> AddressDetail(AddressDetailVM addressDetailVM)
+        [HttpPost(nameof(AddUserDetail)), Authorize]
+        public async Task<ApiCallResponse> AddUserDetail(AddressDetailVM addressDetailVM)
         {
-            var data = await _userService.UpdateAddressDetails(addressDetailVM);
+            var data = await _userService.AddUserDetails(addressDetailVM);
             if(data is null)
             {
                 return new ApiCallResponse()
@@ -134,29 +134,7 @@ namespace AmusementParkTicketManagementSystem.Controllers
                 };
             }
         }
-        [HttpPost(nameof(Gender)), Authorize]
-        public async Task<ApiCallResponse> Gender(string gender)
-        {
-            var data = await _userService.Genders(gender);
-            if(data is null)
-            {
-                return new ApiCallResponse()
-                {
-                    Success = false,
-                    Data = null,
-                    ErrorMessage = "Invalid Gender"
-                };  
-            }
-            else
-            {
-                return new ApiCallResponse()
-                {
-                    Success = true,
-                    Data = data,
-                };
-            }
-        }
-
+        
         
         [HttpGet(nameof(GetUserProfile)), Authorize]
         public async Task<ApiCallResponse> GetUserProfile()

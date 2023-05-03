@@ -13,7 +13,6 @@ namespace APMS.Services.Interface
         Task<bool> UpdateUserProfile(RegisterVM registerVM);
         Task<bool> UploadProfilePicture(IFormFile file, byte[] profilePicture);
         Task<byte[]?> GetProfilePictureAsync();
-        Task<Response> Genders(string gender);
-        Task<Response> UpdateAddressDetails(AddressDetailVM addressDetailVM);
+        Task<Response> AddUserDetails(AddressDetailVM addressDetailVM);
     }
 }
